@@ -1,30 +1,14 @@
-import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import { AddForm, AddField, InputLabel, SubmitButton } from './ContactForm.styled';
 import {  useSelector, useDispatch } from "react-redux";
-import { addContact } from '../../redux/store';
+import { addContact } from '../../redux/contactsSlice';
 import { nanoid } from 'nanoid';
-
-
-    
-
-export const createNewContact = (contacts, data) => {
-    if (contacts.find(contact => contact.name === data.name)) {
-      alert(`${data.name} is already in contacts`)
-    } else if (data.number.trim() === "" && data.name.trim() === "") {
-      alert(`Enter name and number`)
-    } else if (data.name.trim() === "") {
-      alert(`Сontact must contain a name`)
-    } else if (data.number.trim() === "") {
-      alert(`Сontact must contain a number`)
-    } else {
-      return ({ id: nanoid(), ...data })          
-    }
-}
+import { getContacts } from '../../redux/selectors';
 
 
 export const ContactForm = () => {
     const dispatch = useDispatch();
+    const contacts = useSelector(getContacts);
 
     const initialValues = {
         name: '',
@@ -32,7 +16,25 @@ export const ContactForm = () => {
     };
 
     return (
-        <Formik initialValues={initialValues} onSubmit={(values, actions) => { dispatch(addContact(values));  actions.resetForm();}}>
+        <Formik initialValues={initialValues}
+            onSubmit={(values, actions) => {
+                const createNewContact = (contacts, data) => {
+                    if (contacts.find(contact => contact.name === data.name)) {
+                        alert(`${data.name} is already in contacts`)
+                    } else if (data.number.trim() === "" && data.name.trim() === "") {
+                        alert(`Enter name and number`)
+                    } else if (data.name.trim() === "") {
+                        alert(`Сontact must contain a name`)
+                    } else if (data.number.trim() === "") {
+                        alert(`Сontact must contain a number`)
+                    } else {
+                        dispatch(addContact({ id: nanoid(), ...data }));
+                        actions.resetForm();
+                    }
+                };
+
+                createNewContact(contacts, values); 
+            }}>
             <AddForm>
                 <InputLabel >
                     Name
@@ -49,8 +51,4 @@ export const ContactForm = () => {
         </Formik>
     );
 }
-
-// ContactForm.propTypes = {
-//     onAddContact: PropTypes.func.isRequired,
-// }
 

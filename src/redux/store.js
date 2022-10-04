@@ -1,39 +1,25 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { createReducer, createAction } from "@reduxjs/toolkit";
-import { createNewContact } from '../components/ContactForm/ContactForm';
-
-export const addContact = createAction('contacts/addContact');
-export const deleteContact = createAction('contacts/deleteContact');
-// console.log([addContact]);
-
-
-const contactsReduser = createReducer([
-    {
-        id: 123,
-        name: 'cat',
-        number: 123123
-    },
-    {
-        id: 567,
-        name: 'rat',
-        number: 3426346
-    },
-    {
-        id: 789,
-        name: 'dog',
-        number: 456568
-    }
-], {
-    [addContact]: (state, action) => {
-        state.push(createNewContact(state, action.payload))
-    },
-    [deleteContact]: (state, action) =>{
-        return state.filter(contact => contact.id !== action.payload)
-    }
-});
+import { contactsReducer } from '../redux/contactsSlice';
+import { filterSlice } from '../redux/filterSlice';
+import { persistStore,   FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER, } from 'redux-persist';
 
 export const store = configureStore({
     reducer: {
-      contacts: contactsReduser
+        contacts: contactsReducer,
+        filter: filterSlice.reducer
     },
+    middleware(getDefaultMiddleware) {
+        return getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        })
+    }
 });
+
+export const persistor = persistStore(store);
