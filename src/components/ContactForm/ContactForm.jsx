@@ -4,6 +4,8 @@ import {  useSelector, useDispatch } from "react-redux";
 import { addContact } from '../../redux/contactsSlice';
 import { nanoid } from 'nanoid';
 import { getContacts } from '../../redux/selectors';
+import { filteredContacts } from "../../redux/contactsSlice";
+
 
 
 export const ContactForm = () => {
@@ -19,7 +21,7 @@ export const ContactForm = () => {
         <Formik initialValues={initialValues}
             onSubmit={(values, actions) => {
                 const createNewContact = (contacts, data) => {
-                    if (contacts.find(contact => contact.name === data.name)) {
+                    if (filteredContacts(contacts).find(contact => contact.name === data.name)) {
                         alert(`${data.name} is already in contacts`)
                     } else if (data.number.trim() === "" && data.name.trim() === "") {
                         alert(`Enter name and number`)
